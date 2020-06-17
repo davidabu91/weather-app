@@ -1,0 +1,37 @@
+.card-list {
+    width: 85vw;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 20$ 20$ 20$ 20$ 20$;
+    grid-gap: 20px;
+}
+
+.button {
+    border: solid;
+    line-height: 25px;
+    padding: 0 35px 0 35px;
+    font-size: 15px;
+    color: black;
+    border: none;
+    cursor: pointer;
+}
+
+.add-button {
+    line-height: 25px;
+    padding: 0 35px 0 35px;
+    font-size: 15px;
+    background-color: red;
+    color: black;
+    border: none;
+    cursor: pointer;
+}
+
+.container {
+    display: grid;
+    grid-template-rows: 20$ 20$ 20$ 20$ 20$;
+}
+
+.button-container {
+    display: grid;
+    grid-gap: 3px;
+}

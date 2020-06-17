@@ -1,0 +1,9 @@
+.card {
+    display: flex;
+    flex-direction: column;
+    background-color: rgba(85, 221, 187, 0.667);
+    border: 1px solid gray;
+    border-radius: 5px;
+    padding: 25px;
+    cursor: pointer;
+}
