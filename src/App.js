@@ -1,26 +1,41 @@
 import React, { useState } from 'react';
 import {
-    HashRouter as Router,
+    BrowserRouter as Router,
     Switch,
     Route,
 } from "react-router-dom";
 import Home from './components/home/Home.component';
-import Favorites from './components/favorites/Favorites.component';
+import Favoritess from './components/favorites/Favorites.component';
 import './App.css';
 import Header from './components/header/Header.component';
 
 function App() {
 
-    const apiKey = 'pbMi18QKIQNM2jsp1tjmvujSbTVW6ebv'
+    const apiKey = 'QPLWLUMvzwLkfk9LzC2r3k8dkZ4g96oh'
 
     const [favorites, setFavorites] = useState([]) ///מכיל את פרטי הערים המועדפות
-    const [favoritCity, setFavoritCity] = useState('') ///מכיל רק  את שמות הערים המועדפות
+    const [favoritCity, setFavoritCity] = useState([]) ///מכיל רק  את שמות הערים המועדפות
     const [fiveDays, setFiveDays] = useState() ///מכיל את פרטי מזג האוויר לחמישה ימים עבור העיר הנבחרת על ידי המשתמש במסך המועדפים. מערך זה עובר למסך הבית להצגה
+    const [currentCity, setCurrentCity] = useState() ///סטייט המכיל תשובה מקריאה לשרת עבור פרטי מזג אוויר נוכחיים עבןר עיר
 
-    //פונקציה שמופעלת בעת לחיצה על לינק מן המועדפים למסך הבית
-    //הפונקציה מעדכנת את מערך "חמישה ימים" בפרטים לפי העיר שנבחרה
-    const setCurrentCity = (currentCity) => {
-        setFiveDays(currentCity)
+
+    //פונקציה שמבקשת מהשרת פרטי מזג אוויר נוכחיים עבור עיר
+    const getCurrentCity = (id, name) => {
+        fetch(`http://dataservice.accuweather.com/currentconditions/v1/${id}?apikey=${apiKey}`)
+            .then(response => response.json())
+            .then(response => {
+                setCurrentCity({
+                    discreption: response[0]['WeatherText'],
+                    name: name,
+                    id: id,
+                    icon: response[0].WeatherIcon,
+                    temp: response[0].Temperature.Metric.Value
+                })
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                alert('error!  Something wrong with calling a server')
+            })
     }
 
 
@@ -38,21 +53,22 @@ function App() {
     weekday[8] = "Monday";
     weekday[9] = "Tuesday";
     weekday[10] = "Wednesday";
-    const n = weekday[d.getDay()]
 
     //פונקציה הקוראת לשרת חיצוני לקבלת פרטי מזג אוויר לפי מספר מזהה של עיר ספציפית
     //הפונקציב מעדכנת את מערך 5 ימים
     //הפונקציה יודעת לקבל שגיאות במידה והתקשורת עם השרת לא הצליחה
-    const getForecast = (cityId, cityName) => {
-        fetch(`http://dataservice.accuweather.com/forecasts/v1/daily/5day/${cityId}?apikey=${apiKey}`)
+    const getForecast = (id, name) => {
+
+        fetch(`http://dataservice.accuweather.com/forecasts/v1/daily/5day/${id}?apikey=${apiKey}`)
             .then(response => response.json())
             .then(response => {
                 setFiveDays([{
-                        cityName: cityName,
-                        id: cityId,
+                        cityName: name,
+                        id: id,
                         dayName: weekday[d.getDay()],
                         temp: Math.round(toCelsius([response['DailyForecasts'][0]['Temperature']['Maximum']['Value']])),
-                        description: [response['DailyForecasts'][0]['Day']['IconPhrase']],
+                        description: response['DailyForecasts'][0]['Day']['IconPhrase'],
+                        icon: response['DailyForecasts'][0]['Day']['Icon'],
                         key: 0
                     },
                     {
@@ -92,41 +108,43 @@ function App() {
         return (5 / 9) * (f - 32)
     }
 
-    //פונקציה להוספת עיר ופרטי מזג אוויר למסף המועדפים
+    //פונקציה להוספת או הסרת עיר ופרטי מזג אוויר למסף המועדפים
     //מקבלת עיר ופרטי מזג אוויר ליום הנוכחי
     //מעדכת את שני המערכים בסטייסט
-    const addToFavorites = (fiveDays) => {
-        setFavorites([...favorites, fiveDays[0]])
+    const addOrRemoveItem = () => {
+        let index = favoritCity.findIndex(favorit => favorit === fiveDays[0].cityName)
+        if (index !== -1) {
+            let temp = [...favorites]
+            let tempCitys = [...favoritCity]
+            temp.splice(index, 1)
+            tempCitys.splice(index, 1)
+            setFavorites(temp)
+            setFavoritCity(tempCitys)
+            return
+        }
+        setFavorites([...favorites, currentCity])
         setFavoritCity([...favoritCity, fiveDays[0].cityName])
     }
 
 
 
-    //פונקציה להסרה של עיר ממסך המועדפים
-    //מקבלת אינדקס ממסך הבית ומסירה את הערך לפי האינדקס משני המערכים בטייט
-    const remove = (i) => {
-
-        let temp = favorites
-        let tempCitys = favoritCity
-        temp.splice(i, 1)
-        tempCitys.splice(i, 1)
-        setFavorites(temp)
-        setFavoritCity(tempCitys)
-    }
-
     //פונקציה שמופעלת בעת לחיצה על עיר במסך המועדפים
     //מפעילה את הפונקציה גטפורקאסט 
     //לקבלת פרטי מזג האוויר לחמישה ימים ועדכון מסך הבית
     //כך שהמשתמש מקבל את מסך הבית עם פרטי העיר הנבחרת
-    const linkToHome = (cityId, cityName) => {
-        getForecast(cityId, cityName)
+    const linkToHome = (id, name) => {
+        getForecast(id, name)
+        getCurrentCity(id, name)
     }
 
 
     //לא כל כך הצלחתי להבין מה קרה פה
     //היה עדכון בויזואל סטודיו קוד ומאז לא הצלחתי לסדר את הקוד
     //הוא עובד! אבל אני לא הצלחתי לסדר את זה עד שעת ההגשה
-    return ( <
+    return (
+
+
+        <
         div className = "App" >
         <
         Router >
@@ -140,23 +158,24 @@ function App() {
         <
         Route path = "/Favorites" >
         <
-        Favorites favorites = { favorites }
+        Favoritess favorites = { favorites }
         apiKey = { apiKey }
-        remove = { remove }
+        // remove = { remove }
         linkToHome = { linkToHome }
         getForecast = { getForecast }
-        remove = { remove }
-
+        // emove = { remove }
         /> < /
         Route > <
         Route path = "/" >
         <
-        Home addToFavorites = { addToFavorites }
+        Home getForecast = { getForecast }
         favoritCity = { favoritCity }
         apiKey = { apiKey }
-        remove = { remove }
+        // remove = { remove }
         fiveDays = { fiveDays }
-        setCurrentCity = { setCurrentCity }
+        getCurrentCity = { getCurrentCity }
+        currentCity = { currentCity }
+        addOrRemoveItem = { addOrRemoveItem }
         /> < /
         Route > <
         /Switch> < /

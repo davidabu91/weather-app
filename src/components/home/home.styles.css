@@ -6,24 +6,31 @@
     grid-gap: 20px;
 }
 
-.button {
-    border: solid;
+.a {
     line-height: 25px;
     padding: 0 35px 0 35px;
     font-size: 15px;
     color: black;
     border: none;
     cursor: pointer;
+    text-decoration: none;
+}
+
+a:hover {
+    color: #44aaff
 }
 
 .add-button {
-    line-height: 25px;
-    padding: 0 35px 0 35px;
-    font-size: 15px;
-    background-color: red;
-    color: black;
+    background-color: #4CAF50;
     border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
     cursor: pointer;
+    border-radius: 4px;
 }
 
 .container {

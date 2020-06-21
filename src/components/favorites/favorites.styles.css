@@ -7,3 +7,7 @@
     padding: 25px;
     cursor: pointer;
 }
+
+.link {
+    text-decoration: none;
+}
