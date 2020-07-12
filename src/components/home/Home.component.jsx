@@ -72,15 +72,15 @@ export default function Home({
         getForecast(DefaultSearch.id, DefaultSearch.name)
     }
 
-//פונקציה לבחירת עיר מתוך הצעות החיפוש עבור פרטי מזג אוויר
-//בנוסף - הפונקציה מאפסת את האלמנט אשר מציג את תוצאות החיפוש
+    //פונקציה לבחירת עיר מתוך הצעות החיפוש עבור פרטי מזג אוויר
+    //בנוסף - הפונקציה מאפסת את האלמנט אשר מציג את תוצאות החיפוש
     const chooseCity = (e) => {
         getCurrentCity(e.target.id, e.target.name)
         getForecast(e.target.id, e.target.name)
         setDropdown([])
     }
 
- 
+
 
     useEffect(defaultFunction, [])//הפעלה דיפולטיבית לקבלת תוצאות עבור תל אביב
     useEffect(getAutoComplete, [searchQuery])//האזנה לשינוי בשדה החיפוש כדי להפעיל את פונקצית השלמת מילות החיפוש
@@ -104,7 +104,7 @@ export default function Home({
             addOrRemoveButten = 'Remove from favorites '
         }
     }
-    
+
 
     return (
         <div className='container'>
@@ -119,12 +119,13 @@ export default function Home({
                     {dropdownDiv}
                 </div>
             </div>
-            <div>{currentCity ? <div>
-                <h2>{currentCity.name}</h2>
-                <h5>{`${currentCity.temp} C`}</h5>
-                <button className='add-button' onClick={addOrRemoveItem}>{addOrRemoveButten}</button>
+            <div>{currentCity ?
+                <div>
+                    <h2>{currentCity.name}</h2>
+                    <h5>{`${currentCity.temp} C`}</h5>
+                    <button className='add-button' onClick={addOrRemoveItem}>{addOrRemoveButten}</button>
 
-            </div>
+                </div>
                 : null}
             </div>
 
